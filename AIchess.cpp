@@ -2,75 +2,84 @@
 #include<stdlib.h>
 #include<time.h>
 #include"AIchess.h"
+#include"GoBang.h"
 
 using namespace std;
 
-void operate ::centrOprt(int i)
+operate::operate()
+{
+	m_person = 0;
+	m_computer = 0;
+	m_luozi.col = 0;
+	m_luozi.row = 0;
+}
+
+void operate ::centrOprt(int i, GoBang &g)
 {
     if(i==1)//                                                     需要加参数
     {
-        computer=1;
-        person=2;
+        m_computer=1;
+        m_person=2;
     }
     else
     {
-        computer=2;
-        person=1;
+        m_computer=2;
+        m_person=1;
     }
     int n=1;
     while(1){
-        if(n==person)
+        if(n == m_person)
         {
-            //                                                    add person operation
+			g.PlayChess(2, flag2);
         }
         else
         {
-            comptrOprt();
+            comptrOprt(g);
         }
-        if(1==endJudge())
+        if(1==endJudge(g))
         {
-            if(n==person)
+            if(n==m_person)
             {
-                cout<<"person win!";
+                cout<<"m_person win!";
                 system("pause");
                 break;
             }
             else
             {
-                cout<<"computer win!";
+                cout<<"m_computer win!";
                 system("pause");
                 break;
             }           
         }
         else
         {
-            n=(n==1)?2:1;
+            n = (n == 1) ? 2 : 1;
         }
     }
 }
 
-void operate ::comptrOprt()
+void operate ::comptrOprt(GoBang &g)
 {
-    cout << "Turn the computer" << endl; 
-    point best1, best2;
+    //cout << "Turn the m_computer" << endl;
+	point best1 , best2 ;
     do{
         srand(time(NULL));
         best1.col = best2.col = rand()%15;
         best1.row = best2.row = rand()%15;
     } 
-    while(Array[best1.col][best1.row] != 0);
-    int a1 = calScore(best1, computer), b1 = calScore(best1, person);
+    while(g._iChessBoard[best1.col][best1.row] != 0);
+    int a1 = calScore(best1, m_computer, g), b1 = calScore(best1, m_person, g);
     for(int i = 0; i < 15; i ++)
     {
         for(int j = 0; j < 15; j ++)
         {
-            if(Array[i][j] != 0)
+            if(g._iChessBoard[i][j] != 0)
             {
                 continue;
             }
             point cur = {i, j};
-            int m1 = calScore(cur, computer);
-            int m2 = calScore(cur, person);
+            int m1 = calScore(cur, m_computer, g);
+            int m2 = calScore(cur, m_person, g);
             if(m1 > a1)
             {
                 best1 = cur;
@@ -87,18 +96,18 @@ void operate ::comptrOprt()
             }
         }
     }
-    int a2 = calScore(best2, person), b2 = calScore(best2, computer);
+    int a2 = calScore(best2, m_person, g), b2 = calScore(best2, m_computer, g);
     for(int i = 0; i < 15; i ++)
     {
         for(int j = 0; j < 15; j ++)
         {
-            if(Array[i][j] != 0)
+            if(g._iChessBoard[i][j] != 0)
             {
                 continue;
             }
             point cur = {i, j};
-            int m1 = calScore(cur, person);
-            int m2 = calScore(cur, computer);
+            int m1 = calScore(cur, m_person, g);
+            int m2 = calScore(cur, m_computer, g);
             if(m1 > a2)
             {
                 best2 = cur;
@@ -117,17 +126,17 @@ void operate ::comptrOprt()
     }    
     if(a1 >= a2)
     {
-        luozi = best1;
+        m_luozi = best1;
     }
     else
     {
-        luozi = best2;
+        m_luozi = best2;
     }
-    Array[luozi.col][luozi.row] = computer;
-    //                                                     画图函数
+	g._iChessBoard[m_luozi.col][m_luozi .row] = m_computer;
+    g.PrintChessBoard();	//画图函数
 }
 
-bool operate ::endJudge()
+bool operate ::endJudge(GoBang &g)
 {
     int i = 1;
     for(;i <= 4;i ++)
@@ -150,8 +159,8 @@ bool operate ::endJudge()
         }
         for(int j = -4; j <= 4; j ++)
         {
-            point p1 = newPoint(luozi, d, j);
-            if(inBoardJudge(p1) && (Array[p1.col][p1.row] == Array[luozi.col][luozi.row]))
+            point p1 = newPoint(m_luozi, d, j);
+            if(inBoardJudge(p1) && (g._iChessBoard[p1.col][p1.row] == g._iChessBoard[m_luozi.col][m_luozi.row]))
             {
                 count ++;
             }
@@ -170,7 +179,7 @@ bool operate ::endJudge()
 
 bool operate ::inBoardJudge(point p)
 {
-    if(p.col >= 0 && p.col < SIZE && p.row >= 0 && p.row < SIZE)//在其他文件中预定义生成，后作修改
+    if(p.col >= 0 && p.col < N && p.row >= 0 && p.row < N)//在其他文件中预定义生成，后作修改
     {
         return true;
     }
@@ -181,7 +190,7 @@ bool operate ::inBoardJudge(point p)
 }
 
 
-int operate ::calScore(point p, int side)
+int operate ::calScore(point p, int side, GoBang &g)
 {
     int lian5 = 0;
     int alive4 = 0; 
@@ -225,14 +234,18 @@ int operate ::calScore(point p, int side)
        point le, ri, p1;
        int left[5], right[5];
        p1 = newPoint(p, d, -1);
-       while(inBoardJudge(p1) && Array[p1.col][p1.row] == side)//查找负方向的棋子个数，遇到非同色棋子或出界跳出循环
+	   /*le = newPoint(p, d, 0);*/
+	   le = p1;
+       while(inBoardJudge(p1) && g._iChessBoard[p1.col][p1.row] == side)//查找负方向的棋子个数，遇到非同色棋子或出界跳出循环
        {
             le = p1;
             p1 = newPoint(p1, d, -1);//指向下一个负位置
             l ++;
        }
        p1 = newPoint(p, d, 1);
-       while(inBoardJudge(p1) && Array[p1.col][p1.row] == side)//查找正方向的棋子个数，遇到非同色棋子或出界跳出循环
+	   //
+	   ri = p;
+       while(inBoardJudge(p1) && g._iChessBoard[p1.col][p1.row] == side)//查找正方向的棋子个数，遇到非同色棋子或出界跳出循环
        {
             ri = p1;
             p1 = newPoint(p1, d, 1);//指向下一个正位置
@@ -243,7 +256,7 @@ int operate ::calScore(point p, int side)
             p1 = newPoint(le, d, -j);//记录负方向
             if(inBoardJudge(p1))
             {
-                left[j] = Array[p1.col][p1.row];
+                left[j] = g._iChessBoard[p1.col][p1.row];
             }
             else//如果出界则用对手的棋子取代
             {
@@ -252,7 +265,7 @@ int operate ::calScore(point p, int side)
             p1 = newPoint(ri, d, j);//记录正方向
             if(inBoardJudge(p1))
             {
-                right[j] = Array[p1.col][p1.row];
+                right[j] = g._iChessBoard[p1.col][p1.row];
             }
             else
             {
