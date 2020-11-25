@@ -1,12 +1,7 @@
 #ifndef _AIchess_H_
 #define _AIchess_H_
-#include<vector>
 
-using std::vector;
-
-//存储棋盘的信息
-vector< vector<int> > Array;
-
+#include"GoBang.h"
 //point结构体，用来表示点的坐标
 struct point{
     int col;
@@ -27,21 +22,22 @@ const drctn d2 = {1, 0};//竖
 const drctn d3 = {1, -1};//右斜 
 const drctn d4 = {1, 1};//左斜
 
-class operate{
+
+class operate:public GoBang{
 private: 
-    int person;//玩家棋子 
-    int computer;//电脑棋子 
-    int  row;//光标横坐标
-    int  col;//光标纵坐标 
-    point luozi;//落子位置 ，包含横纵坐标
+    int m_person;//玩家棋子 
+    int m_computer;//电脑棋子 
+    point m_luozi;//落子位置 ，包含横纵坐标
 public:
 /**********************
 参数：int i
 返回值：void
 功能：人机对战的中心操作
 **********************/
-    void centrOprt(int i);
-
+	operate();
+	~operate() {};
+    void centrOprt(int i, GoBang &g);
+	
 
 /************************************
 参数：无
@@ -50,7 +46,7 @@ public:
 统计每个空位置的最大分值，决定进攻或防守
 方式
 *************************************/
-    void comptrOprt(); 
+    void comptrOprt(GoBang &g);
 
 
 /**************************************
@@ -58,7 +54,7 @@ public:
 返回值：1或0
 功能：判断游戏是否结束，即是否连成五子
 **************************************/
-    bool endJudge();
+    bool endJudge(GoBang &g);
 
 
 protected:
@@ -76,7 +72,7 @@ protected:
 功能：计算电脑下一步走法的得分，分为
 进攻得分和防守得分
 **********************************/
-    int calScore(point p, int side);
+    int calScore(point p, int side, GoBang &g);
 
 
 
