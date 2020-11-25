@@ -8,25 +8,14 @@ using namespace std;
 
 operate::operate()
 {
-	m_person = 0;
-	m_computer = 0;
+	m_person = 2;
+	m_computer = 1;
 	m_luozi.col = 0;
 	m_luozi.row = 0;
 }
 
-void operate ::centrOprt(int i, GoBang &g)
+void operate ::centrOprt(int n, GoBang &g)
 {
-    if(i==1)//                                                     需要加参数
-    {
-        m_computer=1;
-        m_person=2;
-    }
-    else
-    {
-        m_computer=2;
-        m_person=1;
-    }
-    int n=1;
     while(1){
         if(n == m_person)
         {
@@ -40,13 +29,13 @@ void operate ::centrOprt(int i, GoBang &g)
         {
             if(n==m_person)
             {
-                cout<<"m_person win!";
+                cout<<"玩家胜利!";
                 system("pause");
                 break;
             }
             else
             {
-                cout<<"m_computer win!";
+                cout<<"电脑胜利!";
                 system("pause");
                 break;
             }           
@@ -60,7 +49,7 @@ void operate ::centrOprt(int i, GoBang &g)
 
 void operate ::comptrOprt(GoBang &g)
 {
-    //cout << "Turn the m_computer" << endl;
+    cout << "轮到电脑" << endl;
 	point best1 , best2 ;
     do{
         srand(time(NULL));
@@ -138,7 +127,8 @@ void operate ::comptrOprt(GoBang &g)
 
 bool operate ::endJudge(GoBang &g)
 {
-    int i = 1;
+    int i = 1;//
+	int j = -4;
     for(;i <= 4;i ++)
     {
         drctn d;
@@ -157,7 +147,7 @@ bool operate ::endJudge(GoBang &g)
                 d = d4;
                 break;
         }
-        for(int j = -4; j <= 4; j ++)
+        for(; j <= 4; j ++)
         {
             point p1 = newPoint(m_luozi, d, j);
             if(inBoardJudge(p1) && (g._iChessBoard[p1.col][p1.row] == g._iChessBoard[m_luozi.col][m_luozi.row]))
@@ -192,26 +182,26 @@ bool operate ::inBoardJudge(point p)
 
 int operate ::calScore(point p, int side, GoBang &g)
 {
-    int lian5 = 0;
-    int alive4 = 0; 
-    int die4 = 0;
-    int ddie4 = 0; 
-    int alive3 = 0; 
-    int dalive3 = 0;
-    int die3 = 0;
-    int alive2 = 0;
-    int dalive2 = 0;
-    int die2 = 0;
-    int nothing = 0;
-    int opp = 1;
-    int i = 1;
+    int lian5 = 0;//连成五子
+    int alive4 = 0; //
+    int die4 = 0;//
+    int ddie4 = 0; //
+    int alive3 = 0; //
+    int dalive3 = 0;//
+    int die3 = 0;//
+    int alive2 = 0;//
+    int dalive2 = 0;//
+    int die2 = 0;//
+    int nothing = 0;//
+    int option = 1;//
+    int i = 1;//
     if(side == 1)
     {
-        opp = 2;
+        option = 2;
     }
     else
     {
-        opp = 1;
+        option = 1;
     }
     for(;i <= 4;i ++)
     {
@@ -230,204 +220,202 @@ int operate ::calScore(point p, int side, GoBang &g)
                 d = d4;
                 break;
        }
-       int l=1;//递增记录线上棋子的个数
-       point le, ri, p1;
-       int left[5], right[5];
-       p1 = newPoint(p, d, -1);
-	   /*le = newPoint(p, d, 0);*/
-	   le = p1;
-       while(inBoardJudge(p1) && g._iChessBoard[p1.col][p1.row] == side)//查找负方向的棋子个数，遇到非同色棋子或出界跳出循环
-       {
+    int l=1;//递增记录线上棋子的个数
+    point le, ri, p1;
+    int left[5], right[5];
+    p1 = newPoint(p, d, -1);
+	le = p1;
+    while(inBoardJudge(p1) && g._iChessBoard[p1.col][p1.row] == side)//查找负方向的棋子个数，遇到非同色棋子或出界跳出循环
+    {
             le = p1;
             p1 = newPoint(p1, d, -1);//指向下一个负位置
             l ++;
-       }
-       p1 = newPoint(p, d, 1);
-	   //
-	   ri = p;
-       while(inBoardJudge(p1) && g._iChessBoard[p1.col][p1.row] == side)//查找正方向的棋子个数，遇到非同色棋子或出界跳出循环
-       {
-            ri = p1;
-            p1 = newPoint(p1, d, 1);//指向下一个正位置
-            l ++;
-       }
-       for(int j = 1; j <= 4; j ++)//记录棋型
-       {
-            p1 = newPoint(le, d, -j);//记录负方向
-            if(inBoardJudge(p1))
-            {
-                left[j] = g._iChessBoard[p1.col][p1.row];
-            }
-            else//如果出界则用对手的棋子取代
-            {
-                left[j] = opp;
-            }
-            p1 = newPoint(ri, d, j);//记录正方向
-            if(inBoardJudge(p1))
-            {
-                right[j] = g._iChessBoard[p1.col][p1.row];
-            }
-            else
-            {
-                right[j] = opp;
-            }
-       }
-       if(l == 5){                  
-           lian5 ++;//连5则胜
-       }
-       else if(l == 4){
-              if(left[1] == 0 && right[1] == 0){//alive4 
-                      alive4 ++;
-           }
-           else if(left[1] == 0 || right[1] == 0){//die4
-                   die4 ++;
-           }
-           else{
-                   nothing ++;
-           }
-       }
-       else if(l == 3)
-       {
-            if((left[1] == 0 && left[2] == side) || (right[1] == 0 && right[2] == side))
-            {//ddie4
-                      ddie4 ++;
-            }
-           else if(left[1] == 0 && right[1] == 0 && (left[2] == 0 || right[2] == 0))
-           {//alive3
-                   alive3 ++;                             
-           }
-           else if((left[1] == 0 && left[2] == 0) || (right[1] == 0 && right[2] == 0))
-           {//die3
-                   die3 ++;
-           }
-           else if(left[1] == 0 && right[1] == 0)
-           {//die3
-                   die3 ++; 
-           } 
-           else
-           {//nothing
-                   nothing ++;
-           }
+    }
+    p1 = newPoint(p, d, 1);
+    i = p;
+    while(inBoardJudge(p1) && g._iChessBoard[p1.col][p1.row] == side)//查找正方向的棋子个数，遇到非同色棋子或出界跳出循环
+    {
+         ri = p1;
+         p1 = newPoint(p1, d, 1);//指向下一个正位置
+         l ++;
+    }
+    for(int j = 1; j <= 4; j ++)//记录棋型
+    {
+        p1 = newPoint(le, d, -j);//记录负方向
+        if(inBoardJudge(p1))
+        {
+            left[j] = g._iChessBoard[p1.col][p1.row];
         }
-       else if(l == 2)
-       {
-            if((left[1] == 0 && left[2] == side && left[3] == side) && 
-                (right[1] == 0 && right[2] == side && right[3] == side))
-            {//die4
-                ddie4 ++;
-            }
-           else if(left[1] == 0 && right[1] == 0 && 
-                ((left[2] == side && left[3] == 0) || (right[2] == side && right[3] == 0)))
-            {//dalive3
-                dalive3 ++;
-            }
-           else if((left[1] == 0 && left[3] == 0 && left[2] == side) || 
-                (right[1] == 0 && right[3] == 0 && right[2] == side))
-            {//die3
-                die3 ++;
-            }
-           else if((left[1] == 0 && right[1] == 0) && 
-                (left[2] == side || right[2] == side))
-            {//die3
-                die3 ++;
-            }
-           else if((left[1] == 0 && left[2] == 0 && left[3] == side) || 
-                (right[1] == 0 && right[2] == 0 && right[3] == side))
-            {//die3
-                die3 ++;
-            }
-           else if((left[1] == 0 && right[1] == 0 && right[2] == 0 && right[3] == 0) || 
-                (left[1] == 0 && left[2] == 0 && right[1] == 0 && right[2] == 0) || 
-                (left[1] == 0 && left[2] == 0 && left[3] == 0 && right[1] == 0))
-            {//alive2
-                alive2 ++;
-            }
-           else if((left[1] == 0 && left[2] == 0 && left[3] == 0) || 
-                (right[1] == 0 && right[2] == 0 && right[3] == 0))
-            {//die2
-                die2 ++;
-           }
-           else
-           {//nothing
+        else//如果出界则用对手的棋子取代
+        {
+            left[j] = option;
+        }
+        p1 = newPoint(ri, d, j);//记录正方向
+        if(inBoardJudge(p1))
+        {
+            right[j] = g._iChessBoard[p1.col][p1.row];
+        }
+        else
+        {
+            right[j] = option;
+        }
+    }
+    if(l == 5){                  
+        lian5 ++;//连5则胜
+    }
+    else if(l == 4){
+           if(left[1] == 0 && right[1] == 0){//alive4 
+                   alive4 ++;
+        }
+        else if(left[1] == 0 || right[1] == 0){//die4
+                die4 ++;
+        }
+        else{
                 nothing ++;
-           }
         }
-       else if(l == 1)
-       {
-            if((left[1] == 0 && left[2] == side && left[3] == side && left[4] == side) || 
-                (right[1] == 0 && right[2] == side && right[3] == side && right[4] == side))
-            {//ddie4
-                ddie4 ++;
-           }
-           else if((left[1] == 0 && right[1] == 0) && ((left[2] == side && left[3] == side && left[4] == 0) || 
-                (right[2] == side && right[3] == side && right[4] == 0)))
-            {//dalive3
-                dalive3 ++;
-           }
-           else if((left[1] == 0 && right[1] == 0) && 
-                ((left[2] == side && left[3] == side) || (right[2] == side && right[3] == side)))
-            {//die3
+    }
+    else if(l == 3)
+    {
+         if((left[1] == 0 && left[2] == side) || (right[1] == 0 && right[2] == side))
+         {//ddie4
+                   ddie4 ++;
+         }
+        else if(left[1] == 0 && right[1] == 0 && (left[2] == 0 || right[2] == 0))
+        {//alive3
+                alive3 ++;                             
+        }
+        else if((left[1] == 0 && left[2] == 0) || (right[1] == 0 && right[2] == 0))
+        {//die3
                 die3 ++;
-           }
-           else if((left[1] == 0 && left[4] == 0 && left[2] == side && left[3] == side) || 
-                (right[1] == 0 && right[4] == 0 && right[2] == side && right[3] == side))
-            {//die3
-                die3 ++;
-            }
-           else if((left[1] == 0 && left[2] == 0 && left[3] == side && left[4] == side) || 
-                (right[1] == 0 && right[2] == 0 && right[3] == side && right[4] == side))
-            {//die3
-                die3 ++;
-           } 
-           else if((left[1] == 0 && left[3] == 0 && left[2] == side && left[4] == side) || 
-                (right[1] == 0 && right[3] == 0 && right[2] == side && right[4] == side))
-            {//die3
-                die3 ++;
-           }
-           else if((left[1] == 0 && right[1] == 0 && right[3] == 0 && right[2] == side) &&
-            (left[2] == 0 || right[4] == 0))
-            {//dalive2
-                dalive2 ++;
-           }
-           else if((right[1] == 0 && left[1] == 0 && left[3] == 0 && left[2] == side) && 
-                (right[2] == 0 || left[4] == 0))
-            {//dalive2
-                dalive2 ++;
-            }
-           else if((left[1] == 0 && right[1] == 0 && right[2] == 0 && right[4] == 0 && right[3] == side) || 
-                (right[1] == 0 && left[1] == 0 && left[2] == 0 && left[4] == 0 && left[3] == side))
-            {//dalive2
-                dalive2 ++;
-            }
-           else if((left[1] == 0 && left[3] == 0 && left[4] == 0 && left[2] == side) || 
-                (right[1] == 0 && right[3] == 0 && right[4] == 0 && right[2] == side))
-            {//die2
-                die2 ++;
-            }
-           else if((left[1] == 0 && right[1] == 0 && right[2] == 0 && left[2] == side) || 
-                (right[1] == 0 && left[1] == 0 && left[2] == 0 && right[2] == side))
-            {//die2
-                die2 ++;
-            }
-           else if((left[1] == 0 && left[2] == 0 && left[4] == 0 && left[3] == side) || 
-                (right[1] == 0 && right[2] == 0 && right[4] == 0 && right[3] == side))
-            {//die2
-                die2 ++;
-            }
-           else if((left[1] == 0 && left[2] == 0 && right[1] == 0 && left[3] == side) || 
-                (right[1] == 0 && right[2] == 0 && left[1] == 0 && right[3] == side))
-            {//die2
-                die2 ++;
-           }
-           else if((left[1] == 0 && left[2] == 0 && left[3] == 0 && left[4] == side) || 
-                (right[1] == 0 && right[2] == 0 && right[3] == 0 && right[4] == side))
-            {//die2
-                die2 ++;
-           }
-           else
-           {//nothing
-                   nothing ++;
-           }
+        }
+        else if(left[1] == 0 && right[1] == 0)
+        {//die3
+                die3 ++; 
+        } 
+        else
+        {//nothing
+                nothing ++;
+        }
+     }
+    else if(l == 2)
+    {
+        if((left[1] == 0 && left[2] == side && left[3] == side) && 
+            (right[1] == 0 && right[2] == side && right[3] == side))
+        {//die4
+            ddie4 ++;
+        }
+        else if(left[1] == 0 && right[1] == 0 && 
+            ((left[2] == side && left[3] == 0) || (right[2] == side && right[3] == 0)))
+        {//dalive3
+            dalive3 ++;
+        }
+        else if((left[1] == 0 && left[3] == 0 && left[2] == side) || 
+            (right[1] == 0 && right[3] == 0 && right[2] == side))
+        {//die3
+            die3 ++;
+        }
+        else if((left[1] == 0 && right[1] == 0) && 
+            (left[2] == side || right[2] == side))
+        {//die3
+            die3 ++;
+        }
+        else if((left[1] == 0 && left[2] == 0 && left[3] == side) || 
+            (right[1] == 0 && right[2] == 0 && right[3] == side))
+        {//die3
+            die3 ++;
+        }
+        else if((left[1] == 0 && right[1] == 0 && right[2] == 0 && right[3] == 0) || 
+            (left[1] == 0 && left[2] == 0 && right[1] == 0 && right[2] == 0) || 
+            (left[1] == 0 && left[2] == 0 && left[3] == 0 && right[1] == 0))
+        {//alive2
+            alive2 ++;
+        }
+        else if((left[1] == 0 && left[2] == 0 && left[3] == 0) || 
+            (right[1] == 0 && right[2] == 0 && right[3] == 0))
+        {//die2
+            die2 ++;
+        }
+        else
+        {//nothing
+             nothing ++;
+        }
+    }
+    else if(l == 1)
+    {
+        if((left[1] == 0 && left[2] == side && left[3] == side && left[4] == side) || 
+            (right[1] == 0 && right[2] == side && right[3] == side && right[4] == side))
+        {//ddie4
+            ddie4 ++;
+        }
+        else if((left[1] == 0 && right[1] == 0) && ((left[2] == side && left[3] == side && left[4] == 0) || 
+            (right[2] == side && right[3] == side && right[4] == 0)))
+        {//dalive3
+            dalive3 ++;
+        }
+        else if((left[1] == 0 && right[1] == 0) && 
+            ((left[2] == side && left[3] == side) || (right[2] == side && right[3] == side)))
+        {//die3
+            die3 ++;
+        }
+        else if((left[1] == 0 && left[4] == 0 && left[2] == side && left[3] == side) || 
+            (right[1] == 0 && right[4] == 0 && right[2] == side && right[3] == side))
+        {//die3
+            die3 ++;
+        }
+        else if((left[1] == 0 && left[2] == 0 && left[3] == side && left[4] == side) || 
+            (right[1] == 0 && right[2] == 0 && right[3] == side && right[4] == side))
+        {//die3
+            die3 ++;
+        } 
+        else if((left[1] == 0 && left[3] == 0 && left[2] == side && left[4] == side) || 
+            (right[1] == 0 && right[3] == 0 && right[2] == side && right[4] == side))
+        {//die3
+            die3 ++;
+        }
+        else if((left[1] == 0 && right[1] == 0 && right[3] == 0 && right[2] == side) &&
+        (left[2] == 0 || right[4] == 0))
+        {//dalive2
+            dalive2 ++;
+        }
+        else if((right[1] == 0 && left[1] == 0 && left[3] == 0 && left[2] == side) && 
+            (right[2] == 0 || left[4] == 0))
+        {//dalive2
+            dalive2 ++;
+        }
+        else if((left[1] == 0 && right[1] == 0 && right[2] == 0 && right[4] == 0 && right[3] == side) || 
+            (right[1] == 0 && left[1] == 0 && left[2] == 0 && left[4] == 0 && left[3] == side))
+        {//dalive2
+            dalive2 ++;
+        }
+        else if((left[1] == 0 && left[3] == 0 && left[4] == 0 && left[2] == side) || 
+            (right[1] == 0 && right[3] == 0 && right[4] == 0 && right[2] == side))
+        {//die2
+            die2 ++;
+        }
+        else if((left[1] == 0 && right[1] == 0 && right[2] == 0 && left[2] == side) || 
+            (right[1] == 0 && left[1] == 0 && left[2] == 0 && right[2] == side))
+        {//die2
+            die2 ++;
+        }
+        else if((left[1] == 0 && left[2] == 0 && left[4] == 0 && left[3] == side) || 
+            (right[1] == 0 && right[2] == 0 && right[4] == 0 && right[3] == side))
+        {//die2
+            die2 ++;
+        }
+        else if((left[1] == 0 && left[2] == 0 && right[1] == 0 && left[3] == side) || 
+            (right[1] == 0 && right[2] == 0 && left[1] == 0 && right[3] == side))
+        {//die2
+            die2 ++;
+        }
+        else if((left[1] == 0 && left[2] == 0 && left[3] == 0 && left[4] == side) || 
+            (right[1] == 0 && right[2] == 0 && right[3] == 0 && right[4] == side))
+        {//die2
+            die2 ++;
+        }
+        else
+        {//nothing
+                nothing ++;
+        }
        }
     }
     if (lian5 >= 1)
@@ -486,11 +474,4 @@ int operate ::calScore(point p, int side, GoBang &g)
     {
         return 1;//没有威胁
     }
-}
-
-
-point operate ::newPoint(point p, drctn d, int lenth)
-{
-    point p1 = {p.col + d.dy * lenth, p.row + d.dx * lenth};
-    return p1;
 }
