@@ -9,7 +9,6 @@ class operate;
 #include <time.h>
 #include <string.h>
 #include <conio.h>
-#include<vector>
 #include <Windows.h>
 
 using namespace std;
