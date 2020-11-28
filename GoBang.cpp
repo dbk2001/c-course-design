@@ -35,13 +35,11 @@ void GoBang::Play(operate & WZQ, GoBang & g)
 			else				//玩家1VS玩家2
 			{
 				PlayChess(/*Play1, */1, flag1);		//玩家1走
-				//PrintChessBoard();
 				if (GetVictory(Play1, 1, flag1))	//为真则玩家1获胜，1指玩家1
 				{
 					break;
 				}
 				PlayChess(/*Play2, */2, flag2);		//玩家2走
-				//PrintChessBoard();
 				if (GetVictory(Play2, 2, flag2))	//为真则玩家2获胜，2指玩家2
 				{
 					break;
@@ -65,7 +63,7 @@ void GoBang::Play(operate & WZQ, GoBang & g)
 void GoBang::PrintChessBoard()
 {
 	//printf("   |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n");
-	system("cls");		//清屏
+	system("cls");	//清屏
 	for (int i = 0; i < N; i++)
 	{
 		printf("%2d ", i + 1);//打印纵坐标
@@ -102,7 +100,6 @@ void GoBang::PlayChess(int player, int flag)
 	int X = 8 - 1;
 	int Y = 8 - 1;
 
-	//system("cls");		//清屏
 	PrintChessBoard();	//打印棋盘
 
 	/*游戏提示*/
@@ -121,7 +118,6 @@ void GoBang::PlayChess(int player, int flag)
 	{
 		char c = _getch();
 		cout << c;
-		//if ('w' == c) 
 		if ('H' == c)	//↑键
 		{
 			if (Y != 0) 
@@ -133,7 +129,6 @@ void GoBang::PlayChess(int player, int flag)
 				}
 			}
 		}
-		//else if ('s' == c) 
 		else if ('P' == c)	//↓键
 		{
 			if (Y != 14) 
@@ -145,7 +140,6 @@ void GoBang::PlayChess(int player, int flag)
 				}
 			}
 		}
-		//else if ('a' == c) 
 		else if ('K' == c)	//←键
 		{
 			if (X != 0) 
@@ -157,7 +151,6 @@ void GoBang::PlayChess(int player, int flag)
 				}
 			}
 		}
-		//else if ('d' == c) 
 		else if ('M' == c)	//→键
 		{
 			if (X != 14) 
@@ -194,13 +187,11 @@ void GoBang::PlayChess(int player, int flag)
 				{
 					if (_iChessBoard[i][j] != 1 && _iChessBoard[i][j] != 2)
 					{
-						//_ChessBoard[i][j] = ' ';
 						_iChessBoard[i][j] = 0;
 					}
 				}
 			}
 		}
-		//system("cls");		//清屏
 		PrintChessBoard();	//打印棋盘
 
 		/*游戏提示*/
@@ -214,7 +205,6 @@ void GoBang::PlayChess(int player, int flag)
 			cout << "●" << "当前位置：" << (Y + 1) << ", " << (X + 1) << endl;
 		}
 	}
-	//PrintChessBoard();
 }
 
 /*********
@@ -377,13 +367,4 @@ bool GoBang::GetVictory(Position& pos, int player, int flag)
 		return true;	//有人获胜
 	}
 	return false;		//没人获胜
-}
-
-int main()
-{
-	operate WZQ;
-	GoBang g;
-	g.Play(WZQ, g);
-	system("pause");
-	return 0;
 }
